@@ -7,6 +7,7 @@
   <meta name="description" content="AnesCalc: các công cụ tính toán và tra cứu thông tin thuốc gây mê hồi sức, dùng để kiểm tra toán học và tham khảo nhãn thuốc." />
   <title>AnesCalc | Công cụ gây mê hồi sức</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="inhaled.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -19,6 +20,7 @@
         <button type="button" class="nav-link" data-page="infusion"><span aria-hidden="true">↗</span><span>Tốc độ truyền</span></button>
         <button type="button" class="nav-link" data-page="mixing"><span aria-hidden="true">◈</span><span>Pha thuốc</span></button>
         <button type="button" class="nav-link" data-page="physiology"><span aria-hidden="true">♡</span><span>Chỉ số sinh lý</span></button>
+        <button type="button" class="nav-link" data-page="inhaled"><span aria-hidden="true">◌</span><span>Thuốc mê hô hấp</span></button>
         <button type="button" class="nav-link" data-page="drugs"><span aria-hidden="true">☷</span><span>Thư viện thuốc</span></button>
       </nav>
       <div class="sidebar-footer"><span class="online-dot" aria-hidden="true"></span> Hoạt động ngoại tuyến<br/><small>Bản thử nghiệm • 19/11/2026</small></div>
@@ -36,6 +38,7 @@
             <button type="button" class="feature-card" data-goto="infusion"><span class="feature-icon blue">mL</span><strong>Bơm tiêm điện</strong><p>mcg/kg/phút ⇄ mL/giờ</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="mixing"><span class="feature-icon purple">%</span><strong>Pha & nồng độ</strong><p>Thuốc gốc • dung môi • nồng độ</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="physiology"><span class="feature-icon amber">♥</span><strong>Chỉ số sinh lý</strong><p>BMI • MAP • Shock index</p><span class="feature-more">Mở công cụ →</span></button>
+            <button type="button" class="feature-card" data-goto="inhaled"><span class="feature-icon blue">%</span><strong>Thuốc mê hô hấp</strong><p>SVP • hơi bão hòa • MAC tham khảo</p><span class="feature-more">Mở công cụ →</span></button>
           </div>
           <div class="section-head drug-section-head"><div><span class="kicker">THƯ VIỆN</span><h2>Thuốc thường gặp</h2></div><button type="button" class="text-link" data-goto="drugs">Xem tất cả →</button></div>
           <div class="recent-drugs" id="homeDrugList"></div>
@@ -75,6 +78,120 @@
           <div class="phys-results"><div class="phys-result-card"><span>BMI</span><strong id="physBmi">—</strong><small>kg/m²</small><p>Chỉ số khối cơ thể</p></div><div class="phys-result-card"><span>MAP (ước tính)</span><strong id="physMap">—</strong><small>mmHg</small><p>(HATT + 2 × HATTr) / 3</p></div><div class="phys-result-card"><span>Shock index</span><strong id="physShock">—</strong><small>lần/phút ÷ mmHg</small><p>Nhịp tim / HATT</p></div></div><p id="physMessage" class="inline-feedback" role="status"></p>
         </section>
 
+
+        <section class="page" id="page-inhaled" aria-labelledby="inhaled-title">
+          <div class="page-intro">
+            <span class="kicker">06 / KIẾN THỨC &amp; TÍNH TOÁN</span>
+            <h1 id="inhaled-title">Thuốc mê hô hấp &amp; bình bốc hơi</h1>
+            <p>Tra cứu hệ số máu–khí, áp suất hơi bão hòa (SVP) ở 20°C, MAC tham khảo và thực hành phép tính bốc hơi lý thuyết theo tài liệu học tập.</p>
+          </div>
+          <div class="notice">
+            <div class="notice-icon">!</div>
+            <div><strong>Mô hình học tập — không dùng để cài đặt bình bốc hơi trên bệnh nhân</strong>
+              <p>Kết quả giả định buồng bốc hơi bão hòa hoàn toàn, dòng khí cùng điều kiện đo. Không phản ánh nồng độ thuốc thực tế ở đầu ra máy gây mê hay nồng độ cuối thì thở ra (EtAA), và không dùng để chọn MAC hoặc điều chỉnh thuốc mê. Tuân thủ hướng dẫn thiết bị, giám sát khí mê và phác đồ lâm sàng.</p>
+            </div>
+          </div>
+          <div class="vap-top">
+            <div class="vap-card">
+              <h2>Máy tính buồng bốc hơi bão hòa</h2>
+              <p>Đối với mô hình bình bốc hơi chia dòng có buồng bão hòa; chỉ xét Sevoflurane, Isoflurane, Enflurane và Halothane ở 20°C.</p>
+              <div class="vap-fields">
+                <label class="field">Thuốc mê
+                  <select id="vapAgent">
+                    <option value="sevoflurane">Sevoflurane</option>
+                    <option value="isoflurane">Isoflurane</option>
+                    <option value="enflurane">Enflurane</option>
+                    <option value="halothane">Halothane</option>
+                  </select>
+                </label>
+                <label class="field">Áp suất hơi bão hòa (20°C)
+                  <div class="vap-formula" id="vapSelectedSvp">160 mmHg</div>
+                </label>
+                <label class="field">Áp suất tổng PT (mmHg)
+                  <input type="number" min="0" step="any" id="vapPressure" value="760" inputmode="decimal"/>
+                </label>
+                <label class="field">Tổng lưu lượng khí mới FGF (L/phút)
+                  <input type="number" min="0" step="any" id="vapFgf" value="3" inputmode="decimal"/>
+                </label>
+                <label class="field">Khí mang đi qua buồng bốc hơi VC (mL/phút)
+                  <input type="number" min="0" step="any" id="vapCarrier" value="200" inputmode="decimal"/>
+                </label>
+              </div>
+              <div class="vap-formula">
+                <div>SVP / PT = V<sub>A</sub> / (V<sub>C</sub> + V<sub>A</sub>)</div>
+                <div>V<sub>A</sub> = [SVP / (PT − SVP)] × V<sub>C</sub></div>
+                <div>Nồng độ lý thuyết (%) = 100 × V<sub>A</sub> / (FGF × 1000 + V<sub>A</sub>)</div>
+              </div>
+              <p class="vap-note">V<sub>A</sub> là lưu lượng thể tích hơi thuốc tạo thêm (mL/phút), V<sub>C</sub> là lưu lượng khí mang qua buồng. FGF là lưu lượng khí mới tổng, đã bao gồm V<sub>C</sub> và được đổi từ L/phút sang mL/phút. SVP là áp suất hơi bão hòa tại 20°C. PT cần lớn hơn SVP.</p>
+            </div>
+            <div class="vap-card">
+              <h2>Kết quả tính toán</h2>
+              <span class="kicker">NỒNG ĐỘ HƠI THUỐC TRONG HỖN HỢP (LÝ THUYẾT)</span>
+              <div class="vap-result">
+                <strong id="vapPercent" class="vap-primary" aria-live="polite">—</strong>
+                <small>Chỉ là kết quả mô hình lý tưởng, không phải nồng độ tại bệnh nhân.</small>
+              </div>
+              <div class="vap-stats">
+                <div class="vap-stat"><span>Tỷ số SVP / (PT − SVP)</span><strong id="vapRatio">—</strong></div>
+                <div class="vap-stat"><span>Hơi thuốc tạo ra (V<sub>A</sub>)</span><strong id="vapGenerated">—</strong></div>
+                <div class="vap-stat"><span>Phần hơi bão hòa (SVP / PT)</span><strong id="vapSaturated">—</strong></div>
+                <div class="vap-stat"><span>Tổng dòng khí sau pha</span><strong id="vapTotalFlow">—</strong></div>
+              </div>
+              <div id="vapResultMessage" class="vap-feedback" role="status"></div>
+              <h3 style="margin-top:22px">Ví dụ Sevoflurane từ tài liệu</h3>
+              <p>PT = 760 mmHg, SVP = 160 mmHg; khí qua buồng 200 mL/phút, FGF = 3000 mL/phút. Tỷ số chính xác 160/(760 − 160) ≈ 0,2667; V<sub>A</sub> ≈ 53,33 mL/phút và nồng độ lý thuyết ≈ 1,75%. Tài liệu làm tròn tỷ số thành 1/4 nên ước tính khoảng 1,6%.</p>
+            </div>
+          </div>
+
+          <div class="vap-card" style="margin-bottom:16px">
+            <h2>Bảng đặc tính thuốc mê hô hấp</h2>
+            <p>Các số liệu được chép từ tài liệu ảnh người dùng cung cấp. MAC là giá trị tham khảo; thay đổi theo tuổi, điều kiện đo và phối hợp thuốc. Không dùng để tự chọn nồng độ gây mê.</p>
+            <div class="vap-scroll">
+              <table class="vap-table">
+                <thead><tr><th scope="col">Thuốc mê</th><th scope="col">Hệ số máu–khí</th><th scope="col">SVP tại 20°C (mmHg)</th><th scope="col">MAC tham khảo (%)</th><th scope="col">Giới hạn mô hình</th></tr></thead>
+                <tbody id="vapReferenceBody"></tbody>
+              </table>
+            </div>
+            <p class="vap-note"><strong>Lưu ý:</strong> N₂O là khí trong điều kiện thường và bình Desflurane chuyên dụng không tính bằng mô hình chia dòng trên. Các SVP trong bảng được giữ theo tài liệu, có thể phụ thuộc nguồn và nhiệt độ chính xác; không sử dụng như thông số hiệu chuẩn thiết bị.</p>
+          </div>
+
+          <div class="vap-top">
+            <div class="vap-card">
+              <h2>Desflurane &amp; áp suất khí quyển</h2>
+              <p>Phép quy đổi <em>áp suất riêng phần tương đương</em> theo ví dụ của tài liệu, dành để học nguyên lý và phân biệt nồng độ thể tích với áp suất riêng phần.</p>
+              <div class="vap-fields">
+                <label class="field">Nồng độ tham chiếu ở 760 mmHg (%)
+                  <input type="number" min="0" max="100" step="any" id="desDesired" value="6" inputmode="decimal"/>
+                </label>
+                <label class="field">Áp suất khí quyển tại địa điểm (mmHg)
+                  <input type="number" min="0" step="any" id="desPressure" value="380" inputmode="decimal"/>
+                </label>
+              </div>
+              <div class="vap-formula">Nồng độ tương đương (%) = Nồng độ tham chiếu (%) × 760 / PT hiện tại</div>
+              <p class="vap-note"><strong>Không phải hướng dẫn cài đặt:</strong> Cách thiết bị thực tế đáp ứng với độ cao phụ thuộc cơ chế máy và bình bốc hơi. Không áp dụng phép quy đổi này cho Sevoflurane/Isoflurane hay để thay thế theo dõi nồng độ cuối thì thở ra.</p>
+            </div>
+            <div class="vap-card">
+              <h2>Kết quả Desflurane minh họa</h2>
+              <div class="vap-result"><strong id="desEquivalent" class="vap-primary">—</strong><small>Nồng độ thể tích tương đương để giữ cùng áp suất riêng phần, không phải khuyến nghị cài đặt.</small></div>
+              <div class="vap-stats">
+                <div class="vap-stat"><span>Hệ số áp suất 760 / PT</span><strong id="desFactor">—</strong></div>
+                <div class="vap-stat"><span>Áp suất riêng phần tham chiếu</span><strong id="desPartial">—</strong></div>
+              </div>
+              <div id="desMessage" class="vap-feedback" role="status"></div>
+              <p class="vap-note">Ví dụ: 6% ở 760 mmHg tương ứng áp suất riêng phần 45,6 mmHg; tại 380 mmHg, cùng áp suất riêng phần sẽ tương ứng 12% theo thể tích. Trong ảnh, đơn vị đúng là <strong>380 mmHg</strong>, không phải 380 atm.</p>
+            </div>
+          </div>
+          <div class="vap-card">
+            <h3>Ghi chú nguồn &amp; kiểm chứng</h3>
+            <p>Bảng và các phương trình trên dựa theo năm ảnh tài liệu học tập do người dùng gửi ngày 19/11/2026. Công thức xuất phát từ định luật Dalton trong mô hình khí lý tưởng bão hòa; bỏ qua thay đổi nhiệt độ, rò rỉ, thể tích chết, đặc tính máy và sự hấp thu thuốc ở hệ thống gây mê.</p>
+            <p>Giá trị MAC và hệ số máu–khí không phải hằng số áp dụng cho mọi bệnh nhân. Với Desflurane, ví dụ chỉ cho thấy tương đương áp suất riêng phần; không thiết lập cách vận hành của mọi kiểu bình bốc hơi.</p>
+            <div class="vap-links">
+              <a href="https://www.ncbi.nlm.nih.gov/books/NBK548126/" target="_blank" rel="noopener noreferrer">Thông tin dược lý thuốc mê hô hấp ↗</a>
+              <a href="https://www.openanesthesia.org/keywords/vaporizers/" target="_blank" rel="noopener noreferrer">Tham khảo nguyên lý bình bốc hơi ↗</a>
+            </div>
+          </div>
+        </section>
+
         <section class="page" id="page-drugs" aria-labelledby="drugs-title">
           <div class="page-intro"><span class="kicker">05 / THƯ VIỆN</span><h1 id="drugs-title">Tra cứu thuốc GMHS</h1><p>Tóm tắt chọn lọc từ nhãn thuốc chính thức; nội dung không thay thế nhãn đầy đủ hoặc hướng dẫn tại Việt Nam.</p></div>
           <div class="drug-toolbar"><label class="search-field"><span aria-hidden="true">⌕</span><input type="search" id="drugSearch" placeholder="Tìm thuốc, chỉ định, nhóm thuốc..." aria-label="Tìm kiếm thuốc" /></label><div class="drug-filters" aria-label="Lọc nhóm thuốc"><button type="button" class="filter active" data-filter="all">Tất cả</button><button type="button" class="filter" data-filter="anesthetic">Gây mê / giảm đau</button><button type="button" class="filter" data-filter="relaxant">Giãn cơ / giải giãn cơ</button><button type="button" class="filter" data-filter="vasopressor">Vận mạch</button></div></div>
@@ -84,8 +201,10 @@
       <footer class="main-footer"><span>© 2026 AnesCalc • Bản mẫu học tập và kiểm tra phép tính</span><span>Không lưu thông tin bệnh nhân • Không cần đăng nhập</span></footer>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Điều hướng trên điện thoại"><button type="button" data-page="home" class="active">⌂<span>Trang chủ</span></button><button type="button" data-page="bolus">◉<span>Liều</span></button><button type="button" data-page="infusion">↗<span>Truyền</span></button><button type="button" data-page="mixing">◈<span>Pha thuốc</span></button><button type="button" data-page="drugs">☷<span>Thuốc</span></button></nav>
+  <nav class="mobile-nav" aria-label="Điều hướng trên điện thoại"><button type="button" data-page="home" class="active">⌂<span>Trang chủ</span></button><button type="button" data-page="bolus">◉<span>Liều</span></button><button type="button" data-page="infusion">↗<span>Truyền</span></button><button type="button" data-page="mixing">◈<span>Pha thuốc</span></button><button type="button" data-page="drugs">☷<span>Thuốc</span></button><button type="button" data-page="inhaled">◌<span>Hô hấp</span></button></nav>
   <script src="logic.js"></script>
   <script src="app.js"></script>
+  <script src="inhaled.js"></script>
+  <script src="inhaled-ui.js"></script>
 </body>
 </html>
