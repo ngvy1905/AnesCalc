@@ -32,3 +32,18 @@
 @media(max-width:1000px){.vap-top{grid-template-columns:1fr}}
 @media(max-width:520px){.vap-card{padding:18px}.vap-fields{grid-template-columns:1fr}.vap-stats{grid-template-columns:1fr 1fr}.vap-stat strong{font-size:13px}.mobile-nav{grid-template-columns:repeat(6,minmax(0,1fr))}.mobile-nav button span{font-size:8px}.mobile-nav button{font-size:17px}}
 @media(min-width:521px) and (max-width:820px){.mobile-nav{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+
+/* Two-way calculator and expanded agent reference table */
+.vap-fields [hidden]{display:none!important}
+.vap-table{min-width:850px}
+.vap-table td:nth-child(5){white-space:nowrap;font-variant-numeric:tabular-nums}
+.vap-formula strong{display:block;color:#1d4d50;font-size:12px;margin-bottom:7px}
+.vap-formula div{padding:2px 0}
+.vap-card .vap-stats strong{overflow-wrap:anywhere}
+@media(max-width:520px){
+  .vap-table{min-width:810px}
+  .vap-stats{gap:8px}
+  .vap-stat{padding:11px}
+  .vap-formula{font-size:12px;padding:13px}
+}
