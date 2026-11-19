@@ -28,3 +28,23 @@ Nguồn thông tin thuốc là các nhãn kê đơn Hoa Kỳ được tham khả
 ## Kiểm tra toán học
 
 Chạy `node tests.js` trong cùng thư mục. Các trường hợp thử có sẵn: liều bolus, tốc độ truyền và phép tính ngược, pha dung dịch, BMI/MAP/shock index, và trường hợp dữ liệu không hợp lệ.
+
+
+## Thuốc mê hô hấp (bản đề xuất qua Pull Request)
+
+Mục mới gồm bảng tham khảo 6 thuốc (hệ số phân bố máu–khí, SVP ở 20°C và MAC từ ảnh người dùng); máy tính buồng bốc hơi bão hòa dạng chia dòng, và công cụ minh họa áp suất riêng phần tương đương Desflurane theo ví dụ độ cao.
+
+- SVP / PT = VA / (VC + VA), nên VA = VC × SVP / (PT − SVP).
+- Nồng độ lý thuyết (%) = 100 × VA / (1000 × FGF[L/phút] + VA).
+- Công cụ kiểm tra PT > SVP, VC ≤ FGF, số liệu dương; không áp dụng công thức buồng bốc hơi cho N₂O và Desflurane.
+- Ví dụ Sevo: SVP 160 mmHg, PT 760 mmHg, FGF 3 L/phút, VC 200 mL/phút: VA = 53,33 mL/phút, nồng độ lý thuyết ≈ 1,75%. Tài liệu làm tròn tỷ số thành 1/4 nên cho khoảng 1,6%.
+- Desflurane: nồng độ phần trăm tương đương = nồng độ tham chiếu × 760 / PT. Ví dụ 6% ở 760 mmHg tương đương 12% ở 380 mmHg theo áp suất riêng phần (đơn vị mmHg, không phải atm). Đây không phải hướng dẫn cài đặt bình bốc hơi cho bệnh nhân.
+
+Các thông số trong bảng giữ nguyên theo ảnh người dùng, không tự động coi là dữ liệu hiệu chuẩn. Một số nhãn sevoflurane ghi SVP 157 mmHg tại 20°C thay vì 160 mmHg; thông số có thể khác theo nguồn và chế phẩm. Tất cả kết quả là mô hình vật lý lý tưởng, không phản ánh nồng độ thực đo hoặc nhu cầu MAC lâm sàng. Mọi dữ liệu thuốc cần thẩm định chuyên môn trước khi sử dụng trên bệnh nhân.
+
+Kiểm thử bổ sung: node inhaled-tests.js.
+
+Nguồn tham khảo thêm:
+- https://www.openanesthesia.org/keywords/inhaled-anesthetics-in-clinical-use/
+- https://www.openanesthesia.org/keywords/vaporizers-and-waste-gas-evacuation/
+- https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=3dbab949-6ab7-4040-9c81-314e5bb61d41
