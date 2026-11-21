@@ -85,3 +85,28 @@ Nguồn tham khảo bối cảnh:
 - https://www.openanesthesia.org/keywords/inhaled-anesthetics-in-clinical-use/
 - https://www.openanesthesia.org/keywords/vaporizers-and-waste-gas-evacuation/
 - https://accessanesthesiology.mhmedical.com/content.aspx?bookid=3399&sectionid=282994877
+
+
+## Circuit wash-in (mô hình hệ thống vòng lý tưởng)
+
+Trang **Circuit wash-in** sử dụng công thức mô hình một ngăn trộn đều, chỉ nhằm minh họa quá trình thay đổi nồng độ khí trong circuit khi nồng độ khí mới vào và FGF không đổi, không có bệnh nhân hấp thu thuốc, không rò khí và không có hấp phụ bởi hệ thống:
+
+- Hằng số thời gian: tau = V_circuit / FGF (phút), V tính L, FGF tính L/phút.
+- Nồng độ theo thời gian: C(t) = C_in + (C_0 − C_in) × exp(−t/tau).
+- Thời gian tới C_target: t = tau × ln[(C_in−C_0)/(C_in−C_target)], với C_0 ≤ C_target < C_in.
+- Thời gian 90%, 95%, 99% *mức thay đổi đến cân bằng* lần lượt: 2,303 tau; 2,996 tau; 4,605 tau. Đây không phải nồng độ tuyệt đối của khí mê hoặc phần trăm MAC.
+- Đồ thị wash-in từ nồng độ ban đầu đến khí mới đi vào, có điểm mục tiêu.
+
+**Các preset thể tích có thể sửa:** Circle người lớn ví dụ 5 L (thường 4–6 L); Circle nhỏ ví dụ 3 L (minh họa); tự nhập. Ba cấu hình được đo/ghi trong nghiên cứu Shin và cộng sự (2017) có 1,2 L bộ dây:
+- Dräger Primus: tổng 5,9 L (máy 4,7 L + dây 1,2 L).
+- Dräger Perseus: tổng 3,3 L (máy 2,1 L + dây 1,2 L).
+- Dräger Zeus ở chế độ fresh-gas: tổng 3,2 L (máy 2,0 L + dây 1,2 L).
+
+**Quan trọng:** đây là cấu hình nghiên cứu, không phải thông số được xác minh chung cho tất cả máy cùng tên. Máy cùng thể tích có thể có đặc tính wash-in khác do vị trí khí mới vào, kiến trúc ventilator, fresh-gas decoupling, chế độ hồi lưu và hấp thu của bệnh nhân. Đặc biệt, công thức không áp dụng trực tiếp cho Zeus ở chế độ Auto/DIVA, hệ mở hoặc Mapleson/Bain. Người dùng phải xác minh thể tích hữu hiệu phù hợp và theo dõi nồng độ thuốc hít vào/cuối thì thở ra đo thực tế.
+
+**Kiểm thử:** chạy `node washin-tests.js`; GitHub Actions chạy thêm cú pháp các file JS. Kiểm thử số học không phải thẩm định lâm sàng.
+
+**Nguồn:**
+- OpenAnesthesia, Time Constant (cập nhật 25/02/2026): https://www.openanesthesia.org/keywords/time-constant/
+- Shin HW et al., *The effect of fresh gas flow rate and type of anesthesia machine on time to reach target sevoflurane concentration*, BMC Anesthesiology 2017: https://link.springer.com/article/10.1186/s12871-016-0294-y
+- Anesthesia Patient Safety Foundation, Patient Safety and Low-Flow Anesthesia, 2022: https://www.apsf.org/article/patient-safety-and-low-flow-anesthesia/
