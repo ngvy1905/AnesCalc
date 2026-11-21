@@ -8,6 +8,7 @@
   <title>AnesCalc | Công cụ gây mê hồi sức</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="inhaled.css" />
+  <link rel="stylesheet" href="washin.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -21,6 +22,7 @@
         <button type="button" class="nav-link" data-page="mixing"><span aria-hidden="true">◈</span><span>Pha thuốc</span></button>
         <button type="button" class="nav-link" data-page="physiology"><span aria-hidden="true">♡</span><span>Chỉ số sinh lý</span></button>
         <button type="button" class="nav-link" data-page="inhaled"><span aria-hidden="true">◌</span><span>Thuốc mê hô hấp</span></button>
+        <button type="button" class="nav-link" data-page="washin"><span aria-hidden="true">≈</span><span>Circuit wash-in</span></button>
         <button type="button" class="nav-link" data-page="drugs"><span aria-hidden="true">☷</span><span>Thư viện thuốc</span></button>
       </nav>
       <div class="sidebar-footer"><span class="online-dot" aria-hidden="true"></span> Hoạt động ngoại tuyến<br/><small>Bản thử nghiệm • 19/11/2026</small></div>
@@ -39,6 +41,7 @@
             <button type="button" class="feature-card" data-goto="mixing"><span class="feature-icon purple">%</span><strong>Pha & nồng độ</strong><p>Thuốc gốc • dung môi • nồng độ</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="physiology"><span class="feature-icon amber">♥</span><strong>Chỉ số sinh lý</strong><p>BMI • MAP • Shock index</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="inhaled"><span class="feature-icon blue">%</span><strong>Thuốc mê hô hấp</strong><p>SVP • hơi bão hòa • MAC tham khảo</p><span class="feature-more">Mở công cụ →</span></button>
+            <button type="button" class="feature-card" data-goto="washin"><span class="feature-icon aqua">τ</span><strong>Circuit wash-in</strong><p>FGF • thể tích máy • thời gian • đồ thị</p><span class="feature-more">Mở công cụ →</span></button>
           </div>
           <div class="section-head drug-section-head"><div><span class="kicker">THƯ VIỆN</span><h2>Thuốc thường gặp</h2></div><button type="button" class="text-link" data-goto="drugs">Xem tất cả →</button></div>
           <div class="recent-drugs" id="homeDrugList"></div>
@@ -83,6 +86,7 @@
           <div class="page-intro">
             <span class="kicker">06 / KIẾN THỨC &amp; TÍNH TOÁN</span>
             <h1 id="inhaled-title">Thuốc mê hô hấp &amp; bình bốc hơi</h1>
+            <button type="button" class="text-link" data-goto="washin">Mở Circuit wash-in · tính thời gian cân bằng hệ thống →</button>
             <p>Tra cứu hệ số máu–khí, áp suất hơi bão hòa (SVP) ở 20°C, MAC tham khảo và thực hành phép tính bốc hơi lý thuyết theo tài liệu học tập.</p>
           </div>
           <div class="notice">
@@ -211,6 +215,111 @@
           </div>
         </section>
 
+
+        <section class="page" id="page-washin" aria-labelledby="wash-title">
+          <div class="page-intro">
+            <span class="kicker">07 / KIẾN THỨC &amp; TÍNH TOÁN</span>
+            <h1 id="wash-title">Circuit wash-in</h1>
+            <p>Mô phỏng tốc độ thay đổi nồng độ khí trong hệ thống vòng khi khí mới được cung cấp liên tục. Chọn cấu hình máy để điền thể tích tham khảo, sau đó có thể chỉnh theo hệ thống thực tế.</p>
+          </div>
+          <div class="notice">
+            <div class="notice-icon">!</div>
+            <div><strong>Chỉ mô hình trộn đều lý tưởng — không dùng để quyết định nồng độ thuốc mê trên bệnh nhân</strong>
+              <p>Thời gian tính cho khí trong circuit, <strong>không phải EtAA, độ mê, thời gian khởi mê hay wash-in đo được trên máy</strong>. Không tính hấp thu thuốc bởi bệnh nhân, FRC, tái hít, rò khí, hấp phụ lên bộ dây, thay đổi nhiệt độ, sự đáp ứng của bình bốc hơi hoặc sự khác biệt giữa nồng độ khí mới và khí hít vào. Luôn theo dõi khí mê hít vào/cuối thì thở ra.</p>
+            </div>
+          </div>
+          <div class="wash-grid">
+            <div class="wash-panel">
+              <h2>1. Chọn hệ thống và thông số</h2>
+              <label class="field">Cấu hình máy / hệ thống vòng
+                <select id="washPreset">
+                  <option value="circle-standard">Circle người lớn tiêu chuẩn (ví dụ 5 L)</option>
+                  <option value="primus-study">Dräger Primus (nghiên cứu: 5,9 L)</option>
+                  <option value="perseus-study">Dräger Perseus (nghiên cứu: 3,3 L)</option>
+                  <option value="zeus-fresh-study">Dräger Zeus — fresh-gas mode (nghiên cứu: 3,2 L)</option>
+                  <option value="circle-compact">Circle thể tích thấp (ví dụ 3 L)</option>
+                  <option value="custom">Tự nhập thể tích hệ thống</option>
+                </select>
+              </label>
+              <p id="washPresetInfo" class="wash-note" role="status">Giá trị thể tích để minh họa, có thể khác cấu hình thực tế.</p>
+              <div class="wash-fields">
+                <label class="field">Thể tích khí hữu hiệu của hệ thống (L)
+                  <input id="washVolume" type="number" inputmode="decimal" min="0" step="any" value="5"/>
+                </label>
+                <label class="field">Lưu lượng khí mới FGF (L/phút)
+                  <input id="washFgf" type="number" inputmode="decimal" min="0" step="any" value="5"/>
+                </label>
+              </div>
+              <p class="wash-note"><strong>Chọn nhanh FGF minh họa:</strong></p>
+              <div class="wash-quickflows" aria-label="Đặt nhanh lưu lượng khí mới">
+                <button type="button" data-wash-fgf="0.5">0,5</button>
+                <button type="button" data-wash-fgf="1">1</button>
+                <button type="button" data-wash-fgf="2">2</button>
+                <button type="button" data-wash-fgf="4">4</button>
+                <button type="button" data-wash-fgf="6">6</button>
+                <button type="button" data-wash-fgf="8">8</button>
+              </div>
+              <div class="wash-fields">
+                <label class="field">Nồng độ ban đầu trong circuit (%)
+                  <input id="washInitial" type="number" inputmode="decimal" min="0" max="100" step="any" value="0"/>
+                </label>
+                <label class="field">Nồng độ khí mới đi vào hệ thống (%)
+                  <input id="washInlet" type="number" inputmode="decimal" min="0" max="100" step="any" value="3"/>
+                </label>
+                <label class="field full">Nồng độ muốn đạt trong circuit (%)
+                  <input id="washTarget" type="number" inputmode="decimal" min="0" max="100" step="any" value="2"/>
+                </label>
+              </div>
+              <p class="wash-note"><strong>Lưu ý nguồn khí:</strong> Nồng độ khí mới nhập vào phải là nồng độ khí thực sự đưa vào mô hình circuit; không mặc nhiên bằng số cài trên bình bốc hơi ở mọi hệ thống. Thể tích hữu hiệu gồm các thành phần tham gia trao đổi khí trong hệ vòng, phụ thuộc cách lắp máy.</p>
+            </div>
+            <div class="wash-panel">
+              <h2>2. Kết quả thời gian wash-in</h2>
+              <div class="wash-metric">
+                <span>THỜI GIAN ĐỂ ĐẠT NỒNG ĐỘ CIRCUIT ĐÃ NHẬP</span>
+                <strong id="washTargetTime" aria-live="polite">—</strong>
+              </div>
+              <div class="wash-stat-grid">
+                <div class="wash-stat"><span>Hằng số thời gian τ</span><strong id="washTau">—</strong></div>
+                <div class="wash-stat"><span>Phần biến đổi đã đạt ở đích</span><strong id="washProgress">—</strong></div>
+                <div class="wash-stat"><span>Đạt 90% mức thay đổi</span><strong id="washT90">—</strong></div>
+                <div class="wash-stat"><span>Đạt 95% mức thay đổi</span><strong id="washT95">—</strong></div>
+                <div class="wash-stat"><span>Đạt 99% mức thay đổi</span><strong id="washT99">—</strong></div>
+              </div>
+              <div id="washResultMessage" class="wash-help" role="status"></div>
+              <h2 style="margin-top:24px">Công thức tính</h2>
+              <div class="wash-formula">
+                <strong>Hằng số thời gian</strong>
+                <div>τ = V<sub>circuit</sub> / FGF</div>
+              </div>
+              <div class="wash-formula">
+                <strong>Nồng độ ở thời điểm t</strong>
+                <div>C(t) = C<sub>in</sub> + (C<sub>0</sub> − C<sub>in</sub>) × e<sup>−t/τ</sup></div>
+              </div>
+              <div class="wash-formula">
+                <strong>Thời gian đạt C<sub>đích</sub> (khi C<sub>0</sub> ≤ C<sub>đích</sub> &lt; C<sub>in</sub>)</strong>
+                <div>t = τ × ln[(C<sub>in</sub> − C<sub>0</sub>) / (C<sub>in</sub> − C<sub>đích</sub>)]</div>
+              </div>
+              <p class="wash-note">Các nồng độ dùng cùng đơn vị %, thời gian tính bằng phút. Nồng độ chỉ tiến gần C<sub>in</sub> theo tiệm cận, nên không thể đạt chính xác 100% cân bằng trong thời gian hữu hạn.</p>
+            </div>
+          </div>
+          <div class="wash-chart-wrap">
+            <h2>3. Đường cong nồng độ trong circuit theo thời gian</h2>
+            <p class="wash-note">Đường màu xanh là nồng độ trong hệ thống lý tưởng; điểm màu cam là mục tiêu và thời điểm tương ứng.</p>
+            <svg id="washChart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 295" role="img" aria-label="Đồ thị circuit wash-in: nồng độ phần trăm theo phút"></svg>
+            <div class="wash-chart-legend"><span><i class="wash-line"></i> Nồng độ mô phỏng</span><span><i class="wash-line target"></i> Mục tiêu</span></div>
+          </div>
+          <div class="wash-panel">
+            <h2>Nguồn dữ liệu và phạm vi áp dụng</h2>
+            <p>Preset cho Primus, Perseus và Zeus là <strong>thể tích tổng trong cấu hình nghiên cứu</strong> của Shin và cộng sự (2017), bao gồm 1,2 L bộ dây: tương ứng 5,9 L; 3,3 L; 3,2 L. Đây không phải thông số chung cho mọi máy cùng tên. Ví dụ Circle tiêu chuẩn 5 L lấy trong khoảng thường gặp 4–6 L của hệ vòng người lớn; cấu hình Circle nhỏ 3 L là giả định học tập.</p>
+            <p>Các hệ thống khác nhau có thể wash-in thực tế không giống nhau ngay cả khi thể tích khí và FGF tương đương, vì vị trí đầu cấp khí mới, thông khí, hệ thống bù dòng, hút thuốc và tái hít khác nhau. Không áp dụng trực tiếp phương trình này cho Mapleson/Bain, hệ mở hoặc chế độ Zeus auto/DIVA.</p>
+            <div class="wash-links">
+              <a href="https://www.openanesthesia.org/keywords/time-constant/" target="_blank" rel="noopener noreferrer">OpenAnesthesia — Time Constant ↗</a>
+              <a href="https://link.springer.com/article/10.1186/s12871-016-0294-y" target="_blank" rel="noopener noreferrer">Shin et al. 2017 — So sánh máy Primus, Perseus, Zeus ↗</a>
+              <a href="https://www.apsf.org/article/patient-safety-and-low-flow-anesthesia/" target="_blank" rel="noopener noreferrer">APSF — An toàn gây mê lưu lượng thấp ↗</a>
+            </div>
+          </div>
+        </section>
+
         <section class="page" id="page-drugs" aria-labelledby="drugs-title">
           <div class="page-intro"><span class="kicker">05 / THƯ VIỆN</span><h1 id="drugs-title">Tra cứu thuốc GMHS</h1><p>Tóm tắt chọn lọc từ nhãn thuốc chính thức; nội dung không thay thế nhãn đầy đủ hoặc hướng dẫn tại Việt Nam.</p></div>
           <div class="drug-toolbar"><label class="search-field"><span aria-hidden="true">⌕</span><input type="search" id="drugSearch" placeholder="Tìm thuốc, chỉ định, nhóm thuốc..." aria-label="Tìm kiếm thuốc" /></label><div class="drug-filters" aria-label="Lọc nhóm thuốc"><button type="button" class="filter active" data-filter="all">Tất cả</button><button type="button" class="filter" data-filter="anesthetic">Gây mê / giảm đau</button><button type="button" class="filter" data-filter="relaxant">Giãn cơ / giải giãn cơ</button><button type="button" class="filter" data-filter="vasopressor">Vận mạch</button></div></div>
@@ -225,5 +334,7 @@
   <script src="app.js"></script>
   <script src="inhaled.js"></script>
   <script src="inhaled-ui.js"></script>
+  <script src="washin.js"></script>
+  <script src="washin-ui.js"></script>
 </body>
 </html>
