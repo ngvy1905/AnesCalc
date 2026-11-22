@@ -4,7 +4,7 @@ const core=window.AnesCalcCore;
 const $=id=>document.getElementById(id);
 const n=id=>{const raw=$(id).value.trim().replace(',','.'); return raw===''?NaN:Number(raw);};
 const fmt=(x,max=3)=>Number.isFinite(x)?new Intl.NumberFormat('vi-VN',{maximumFractionDigits:max}).format(x):'—';
-const pageLabels={home:'Tổng quan',bolus:'Tính liều thuốc',infusion:'Tốc độ truyền',mixing:'Pha thuốc',physiology:'Chỉ số sinh lý',inhaled:'Thuốc mê hô hấp',washin:'Circuit wash-in',drugs:'Thư viện thuốc'};
+const pageLabels={home:'Tổng quan',bolus:'Tính liều thuốc',infusion:'Tốc độ truyền',mixing:'Pha thuốc',physiology:'Chỉ số sinh lý',inhaled:'Thuốc mê hô hấp',washin:'Circuit wash-in',blood:'Máu mất & truyền máu',drugs:'Thư viện thuốc'};
 function goto(page){
  if(!pageLabels[page]) return;
  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('visible',p.id==='page-'+page));
