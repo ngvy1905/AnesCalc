@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="inhaled.css" />
   <link rel="stylesheet" href="washin.css" />
+  <link rel="stylesheet" href="blood.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -23,6 +24,7 @@
         <button type="button" class="nav-link" data-page="physiology"><span aria-hidden="true">♡</span><span>Chỉ số sinh lý</span></button>
         <button type="button" class="nav-link" data-page="inhaled"><span aria-hidden="true">◌</span><span>Thuốc mê hô hấp</span></button>
         <button type="button" class="nav-link" data-page="washin"><span aria-hidden="true">≈</span><span>Circuit wash-in</span></button>
+        <button type="button" class="nav-link" data-page="blood"><span aria-hidden="true">◈</span><span>Máu mất & truyền máu</span></button>
         <button type="button" class="nav-link" data-page="drugs"><span aria-hidden="true">☷</span><span>Thư viện thuốc</span></button>
       </nav>
       <div class="sidebar-footer"><span class="online-dot" aria-hidden="true"></span> Hoạt động ngoại tuyến<br/><small>Bản thử nghiệm • 19/11/2026</small></div>
@@ -42,6 +44,7 @@
             <button type="button" class="feature-card" data-goto="physiology"><span class="feature-icon amber">♥</span><strong>Chỉ số sinh lý</strong><p>BMI • MAP • Shock index</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="inhaled"><span class="feature-icon blue">%</span><strong>Thuốc mê hô hấp</strong><p>SVP • hơi bão hòa • MAC tham khảo</p><span class="feature-more">Mở công cụ →</span></button>
             <button type="button" class="feature-card" data-goto="washin"><span class="feature-icon aqua">τ</span><strong>Circuit wash-in</strong><p>FGF • thể tích máy • thời gian • đồ thị</p><span class="feature-more">Mở công cụ →</span></button>
+            <button type="button" class="feature-card" data-goto="blood"><span class="feature-icon amber">Hb</span><strong>Máu mất & truyền máu</strong><p>EBV • MABL • EBL • hướng dẫn AABB</p><span class="feature-more">Mở công cụ →</span></button>
           </div>
           <div class="section-head drug-section-head"><div><span class="kicker">THƯ VIỆN</span><h2>Thuốc thường gặp</h2></div><button type="button" class="text-link" data-goto="drugs">Xem tất cả →</button></div>
           <div class="recent-drugs" id="homeDrugList"></div>
@@ -320,6 +323,181 @@
           </div>
         </section>
 
+
+        <section class="page" id="page-blood" aria-labelledby="blood-title">
+          <div class="page-intro">
+            <span class="kicker">08 / MÁY TÍNH &amp; THAM KHẢO</span>
+            <h1 id="blood-title">Máu mất &amp; truyền máu chu phẫu</h1>
+            <p>Tính thể tích máu tuần hoàn ước tính (EBV), lượng máu mất lý thuyết đến giới hạn Hb/Hct (MABL), lượng máu mất đo được (EBL), tốc độ mất máu và tham khảo tài liệu truyền máu.</p>
+          </div>
+          <div class="notice">
+            <div class="notice-icon">!</div>
+            <div><strong>Không dùng MABL, EBV hay các ngưỡng Hb làm chỉ định truyền máu tự động</strong>
+              <p>Mất máu cấp có thể gây sốc trước khi Hb giảm rõ. Phải đánh giá huyết động, tưới máu, tốc độ chảy máu, xét nghiệm và phác đồ bệnh viện. Các phép tính mang tính chất học tập, chưa được thẩm định thành phần mềm quyết định lâm sàng.</p></div>
+          </div>
+
+          <div class="blood-layout">
+            <div class="blood-card">
+              <h2>1. Thể tích máu tuần hoàn (EBV)</h2>
+              <p>Chọn nhóm để tự điền hệ số tham khảo. Bạn có thể thay hệ số thủ công khi có dữ liệu phù hợp hơn.</p>
+              <div class="blood-fields">
+                <label class="field wide">Nhóm người bệnh
+                  <select id="bloodGroup">
+                    <option value="adult-male">Nam trưởng thành: 70–75 mL/kg</option>
+                    <option value="adult-female">Nữ trưởng thành: 60–65 mL/kg</option>
+                    <option value="child">Trẻ &gt; 1 tuổi: 70–75 mL/kg</option>
+                    <option value="infant">Trẻ nhũ nhi: 75–80 mL/kg</option>
+                    <option value="term">Sơ sinh đủ tháng: 80–90 mL/kg</option>
+                    <option value="preterm">Sơ sinh non tháng: 90–100 mL/kg</option>
+                    <option value="custom">Tự nhập hệ số</option>
+                  </select>
+                </label>
+                <label class="field">Cân nặng (kg)
+                  <input id="bloodWeight" type="number" inputmode="decimal" min="0" step="any" value="70"/>
+                </label>
+                <label class="field">Hệ số (mL/kg)
+                  <input id="bloodFactor" type="number" inputmode="decimal" min="0" step="any" value="70"/>
+                </label>
+              </div>
+              <p class="blood-guide" id="bloodGroupHelp"></p>
+              <div class="blood-formula"><strong>EBV (mL) = cân nặng (kg) × hệ số (mL/kg)</strong></div>
+              <div class="blood-metrics">
+                <div class="blood-metric main"><span>EBV ước tính</span><strong id="bloodEBV">—</strong></div>
+              </div>
+              <div class="blood-guide" id="bloodPatientMsg" role="status"></div>
+              <p>Trẻ em, thai kỳ, béo phì hoặc thay đổi thành phần cơ thể cần lựa chọn phương pháp EBV thích hợp; hệ số trong bảng chỉ là ước tính. Ví dụ nam 70 kg, hệ số 70 mL/kg → 4.900 mL.</p>
+            </div>
+
+            <div class="blood-card">
+              <h2>2. Lượng máu mất cho phép theo mô hình (MABL)</h2>
+              <p>Hai cách tính cùng sử dụng EBV từ ô bên cạnh, nhưng không tương đương về giả định. Chọn ngưỡng Hb/Hct để làm bài toán, không tự coi đây là ngưỡng truyền máu của bệnh nhân.</p>
+              <h3>Cách đơn giản với Hemoglobin</h3>
+              <div class="blood-fields">
+                <label class="field">Hb ban đầu (g/dL)
+                  <input id="bloodHbInitial" type="number" inputmode="decimal" min="0" step="any" value="12"/>
+                </label>
+                <label class="field">Hb giới hạn chọn (g/dL)
+                  <input id="bloodHbMin" type="number" inputmode="decimal" min="0" step="any" value="8"/>
+                </label>
+              </div>
+              <div class="blood-formula">MABL đơn giản = EBV × (Hb<sub>i</sub> − Hb<sub>min</sub>) / Hb<sub>i</sub></div>
+              <div class="blood-metrics"><div class="blood-metric main"><span>MABL đơn giản (Hb)</span><strong id="bloodMablSimple">—</strong></div></div>
+              <h3>Công thức Gross — bối cảnh pha loãng đẳng thể tích (ANH)</h3>
+              <div class="blood-fields">
+                <label class="field">Hct ban đầu (%)
+                  <input id="bloodHctInitial" type="number" inputmode="decimal" min="0" max="100" step="any" value="36"/>
+                </label>
+                <label class="field">Hct giới hạn chọn (%)
+                  <input id="bloodHctMin" type="number" inputmode="decimal" min="0" max="100" step="any" value="24"/>
+                </label>
+              </div>
+              <div class="blood-formula">MABL Gross = EBV × (Hct<sub>i</sub> − Hct<sub>min</sub>) / [(Hct<sub>i</sub> + Hct<sub>min</sub>) / 2]</div>
+              <div class="blood-metrics"><div class="blood-metric"><span>Giá trị Gross (ANH)</span><strong id="bloodMablGross">—</strong></div></div>
+              <div id="bloodMablMsg" class="blood-guide" role="status"></div>
+              <p>Ví dụ EBV 4.900 mL, Hb 12 → 8: MABL đơn giản ≈ 1.633 mL; Hct 36 → 24: Gross ≈ 1.960 mL. Hct ở ví dụ là <em>giá trị nhập riêng</em>, không tự suy ra chính xác bằng cách nhân Hb với 3.</p>
+            </div>
+
+            <div class="blood-card">
+              <h2>3. Lượng máu mất ước tính trong mổ (EBL)</h2>
+              <p>Ước tính từ dịch trong bình hút, dịch rửa và chênh lệch khối lượng gạc. Có thể nhập thêm máu đo được ở vị trí khác khi chắc chắn chưa được tính trùng.</p>
+              <div class="blood-fields">
+                <label class="field">Tổng dịch trong bình hút (mL)
+                  <input id="bloodSuction" type="number" min="0" step="any" inputmode="decimal" value="1200"/>
+                </label>
+                <label class="field">Dịch rửa đã vào bình hút (mL)
+                  <input id="bloodIrrigation" type="number" min="0" step="any" inputmode="decimal" value="400"/>
+                </label>
+                <label class="field">Gạc ướt — tổng khối lượng (g)
+                  <input id="bloodWet" type="number" min="0" step="any" inputmode="decimal" value="550"/>
+                </label>
+                <label class="field">Gạc khô — tổng khối lượng (g)
+                  <input id="bloodDry" type="number" min="0" step="any" inputmode="decimal" value="300"/>
+                </label>
+                <label class="field wide">Máu đo thêm chưa tính trong bình/gạc (mL)
+                  <input id="bloodOther" type="number" min="0" step="any" inputmode="decimal" value="0"/>
+                </label>
+              </div>
+              <div class="blood-formula">EBL = (bình hút − dịch rửa) + (gạc ướt − gạc khô) × 1 mL/g + máu đo riêng</div>
+              <div class="blood-metrics">
+                <div class="blood-metric main"><span>EBL ước tính</span><strong id="bloodEBL">—</strong></div>
+                <div class="blood-metric"><span>EBL / EBV</span><strong id="bloodEblPercent">—</strong></div>
+                <div class="blood-metric"><span>Máu ròng trong bình hút</span><strong id="bloodSuctionNet">—</strong></div>
+                <div class="blood-metric"><span>Máu ước tính từ gạc</span><strong id="bloodGauzeNet">—</strong></div>
+                <div class="blood-metric"><span>EBL / MABL đơn giản (chỉ tỷ số)</span><strong id="bloodMablFraction">—</strong></div>
+              </div>
+              <div id="bloodEblMsg" class="blood-guide" role="status"></div>
+              <p>Không tính được một số phần mất máu kín nếu không được đo. Dịch ổ bụng, nước tiểu, dịch rửa thấm gạc hoặc máu đọng ngoài trường đo có thể làm EBL cao/thấp sai lệch.</p>
+            </div>
+
+            <div class="blood-card">
+              <h2>4. Tốc độ mất máu</h2>
+              <div class="blood-fields">
+                <label class="field">Máu mất thêm trong khoảng theo dõi (mL)
+                  <input id="bloodRateDelta" type="number" min="0" step="any" inputmode="decimal" value="600"/>
+                </label>
+                <label class="field">Khoảng thời gian (phút)
+                  <input id="bloodRateMins" type="number" min="0" step="any" inputmode="decimal" value="30"/>
+                </label>
+              </div>
+              <div class="blood-formula">Tốc độ (mL/giờ) = ΔEBL (mL) × 60 / Δt (phút)</div>
+              <div class="blood-metrics"><div class="blood-metric main"><span>Tốc độ máu mất trong khoảng đo</span><strong id="bloodRateValue">—</strong></div></div>
+              <div id="bloodRateMsg" class="blood-guide" role="status"></div>
+              <h3>5. Ước tính kinh nghiệm Hb sau khối hồng cầu</h3>
+              <p>Chỉ mô tả quy tắc kinh nghiệm cho người trưởng thành khoảng 70 kg, ổn định và không còn chảy máu đáng kể.</p>
+              <div class="blood-fields">
+                <label class="field">Hb hiện tại (g/dL)
+                  <input id="bloodHbNow" type="number" min="0" step="any" inputmode="decimal" value="6.5"/>
+                </label>
+                <label class="field">Hb mục tiêu giả định (g/dL)
+                  <input id="bloodHbGoal" type="number" min="0" step="any" inputmode="decimal" value="8.5"/>
+                </label>
+              </div>
+              <label class="blood-tick"><input id="bloodRbcStable" type="checkbox"/> <span>Tôi đang xét ví dụ về <strong>người trưởng thành ổn định, không tiếp tục chảy máu</strong>, và hiểu kết quả không phải y lệnh.</span></label>
+              <div class="blood-metrics"><div class="blood-metric"><span>Chênh lệch Hb — số đơn vị tương đương theo quy tắc 1 g/dL/đơn vị</span><strong id="bloodRbcUnits">—</strong></div></div>
+              <div id="bloodRbcMsg" class="blood-guide" role="status"></div>
+              <p>Không tự làm tròn số đơn vị để truyền. Trong thực tế cần đánh giá lâm sàng và Hb lại sau truyền từng đơn vị ở bệnh nhân ổn định; sai số lớn hơn khi còn chảy máu, truyền nhiều dịch hoặc tan máu. Không dùng quy tắc này cho trẻ em.</p>
+            </div>
+          </div>
+
+          <div class="blood-card" style="margin-bottom:16px">
+            <h2>6. So sánh các tỷ lệ bù dịch tinh thể trong tài liệu</h2>
+            <p>Chỉ minh họa phép nhân từ EBL đang nhập; <strong>không phải mục tiêu bù dịch hay lượng dịch khuyến cáo</strong>. Cách tiếp cận hiện đại ưu tiên đánh giá thể tích tuần hoàn, tưới máu và đáp ứng huyết động hơn việc áp dụng tỷ lệ cố định.</p>
+            <div class="blood-metrics">
+              <div class="blood-metric"><span>Ví dụ phép nhân 1,5:1</span><strong id="bloodFluid15">—</strong></div>
+              <div class="blood-metric"><span>Quy tắc cổ điển 3:1</span><strong id="bloodFluid3">—</strong></div>
+            </div>
+            <div class="blood-warning">Dịch tinh thể không thay thế khả năng vận chuyển oxy của hồng cầu. Áp dụng tỷ lệ cố định có thể gây quá tải dịch hoặc đánh giá thiếu nhu cầu hồi sức. Không sử dụng các con số trên để kê đơn dịch truyền.</div>
+          </div>
+
+          <div class="blood-card" style="margin-bottom:16px">
+            <h2>7. Ngưỡng Hb trong hướng dẫn truyền hồng cầu — tài liệu tham khảo</h2>
+            <p>Những ngưỡng này áp dụng cho các nhóm người bệnh được hướng dẫn mô tả, đặc biệt là bệnh nhân <strong>huyết động ổn định</strong>. Không phải điều kiện duy nhất để quyết định truyền máu.</p>
+            <div class="blood-responsive"><table class="blood-guide-table">
+              <thead><tr><th scope="col">Tình huống</th><th scope="col">Ngưỡng cân nhắc trong hướng dẫn</th><th scope="col">Nguồn</th></tr></thead>
+              <tbody>
+                <tr><td>Người trưởng thành nằm viện, huyết động ổn định</td><td>Hb &lt; 7 g/dL</td><td>AABB 2023</td></tr>
+                <tr><td>Phẫu thuật tim</td><td>Có thể chọn 7,5 g/dL</td><td>AABB 2023</td></tr>
+                <tr><td>Phẫu thuật chỉnh hình hoặc bệnh tim mạch từ trước</td><td>Có thể chọn 8 g/dL</td><td>AABB 2023</td></tr>
+                <tr><td>Nhồi máu cơ tim cấp (AMI) nằm viện</td><td>AABB gợi ý chiến lược rộng rãi hơn khi Hb &lt; 10 g/dL; khuyến cáo có điều kiện, chứng cứ độ chắc chắn thấp</td><td>AABB 2025</td></tr>
+              </tbody>
+            </table></div>
+            <p class="blood-reference">Nguồn: <a href="https://pubmed.ncbi.nlm.nih.gov/37824153/" target="_blank" rel="noopener noreferrer">AABB 2023 (JAMA)</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/40825204/" target="_blank" rel="noopener noreferrer">AABB 2025 (nhồi máu cơ tim cấp)</a>.</p>
+            <div class="blood-warning"><strong>Xuất huyết ồ ạt hoặc sốc mất máu:</strong> không đợi Hb xuống ngưỡng trên. Cần đánh giá tưới máu và kiểm soát nguồn chảy máu, kích hoạt quy trình xuất huyết nặng/MTP khi phù hợp, theo dõi khí máu, lactate, đông máu, fibrinogen, tiểu cầu, canxi ion hóa, nhiệt độ và đáp ứng hồi sức. Tỷ lệ chế phẩm máu theo MTP tại bệnh viện và kết quả xét nghiệm/TEG/ROTEM, không tự suy ra từ MABL.</div>
+          </div>
+
+          <div class="blood-card">
+            <h2>8. Nguồn và phạm vi sử dụng</h2>
+            <p>EBV và các hệ số mL/kg, công thức MABL đơn giản, phép ước tính EBL, tốc độ mất máu và ví dụ minh họa được xây dựng từ dữ liệu bạn cung cấp. Công thức Gross sử dụng Hct trung bình vốn gắn với pha loãng máu đẳng thể tích (ANH), nên không thể đồng nhất hai kết quả.</p>
+            <p class="blood-reference">Tài liệu tham khảo kiểm chứng:
+              <a href="https://iowaprotocols.medicine.uiowa.edu/protocols/maximum-allowable-blood-loss" target="_blank" rel="noopener noreferrer">University of Iowa — EBV &amp; MABL</a> ·
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11069068/" target="_blank" rel="noopener noreferrer">Patient blood management — Gross trong ANH</a> ·
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11977757/" target="_blank" rel="noopener noreferrer">E-AHPBA — phương pháp EBL định lượng</a> ·
+              <a href="https://professionaleducation.blood.ca/en/transfusion/clinical-guide/blood-components" target="_blank" rel="noopener noreferrer">Canadian Blood Services — đáp ứng Hb sau khối hồng cầu</a> ·
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11069062/" target="_blank" rel="noopener noreferrer">Quản lý dịch chu phẫu theo mục tiêu</a>.</p>
+            <p>Các bảng tóm tắt không thay thế phác đồ và tài liệu gốc. Không lưu dữ liệu bệnh nhân, không tự phân tầng nguy cơ hoặc đưa ra chỉ định truyền máu.</p>
+          </div>
+        </section>
+
         <section class="page" id="page-drugs" aria-labelledby="drugs-title">
           <div class="page-intro"><span class="kicker">05 / THƯ VIỆN</span><h1 id="drugs-title">Tra cứu thuốc GMHS</h1><p>Tóm tắt chọn lọc từ nhãn thuốc chính thức; nội dung không thay thế nhãn đầy đủ hoặc hướng dẫn tại Việt Nam.</p></div>
           <div class="drug-toolbar"><label class="search-field"><span aria-hidden="true">⌕</span><input type="search" id="drugSearch" placeholder="Tìm thuốc, chỉ định, nhóm thuốc..." aria-label="Tìm kiếm thuốc" /></label><div class="drug-filters" aria-label="Lọc nhóm thuốc"><button type="button" class="filter active" data-filter="all">Tất cả</button><button type="button" class="filter" data-filter="anesthetic">Gây mê / giảm đau</button><button type="button" class="filter" data-filter="relaxant">Giãn cơ / giải giãn cơ</button><button type="button" class="filter" data-filter="vasopressor">Vận mạch</button></div></div>
@@ -329,12 +507,14 @@
       <footer class="main-footer"><span>© 2026 AnesCalc • Bản mẫu học tập và kiểm tra phép tính</span><span>Không lưu thông tin bệnh nhân • Không cần đăng nhập</span></footer>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Điều hướng trên điện thoại"><button type="button" data-page="home" class="active">⌂<span>Trang chủ</span></button><button type="button" data-page="bolus">◉<span>Liều</span></button><button type="button" data-page="infusion">↗<span>Truyền</span></button><button type="button" data-page="mixing">◈<span>Pha thuốc</span></button><button type="button" data-page="drugs">☷<span>Thuốc</span></button><button type="button" data-page="inhaled">◌<span>Hô hấp</span></button></nav>
+  <nav class="mobile-nav" aria-label="Điều hướng trên điện thoại"><button type="button" data-page="home" class="active">⌂<span>Trang chủ</span></button><button type="button" data-page="bolus">◉<span>Liều</span></button><button type="button" data-page="infusion">↗<span>Truyền</span></button><button type="button" data-page="mixing">◈<span>Pha thuốc</span></button><button type="button" data-page="drugs">☷<span>Thuốc</span></button><button type="button" data-page="inhaled">◌<span>Hô hấp</span></button><button type="button" data-page="blood">◈<span>Máu</span></button></nav>
   <script src="logic.js"></script>
   <script src="app.js"></script>
   <script src="inhaled.js"></script>
   <script src="inhaled-ui.js"></script>
   <script src="washin.js"></script>
   <script src="washin-ui.js"></script>
+  <script src="blood.js"></script>
+  <script src="blood-ui.js"></script>
 </body>
 </html>
