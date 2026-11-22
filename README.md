@@ -110,3 +110,61 @@ Trang **Circuit wash-in** sử dụng công thức mô hình một ngăn trộn 
 - OpenAnesthesia, Time Constant (cập nhật 25/02/2026): https://www.openanesthesia.org/keywords/time-constant/
 - Shin HW et al., *The effect of fresh gas flow rate and type of anesthesia machine on time to reach target sevoflurane concentration*, BMC Anesthesiology 2017: https://link.springer.com/article/10.1186/s12871-016-0294-y
 - Anesthesia Patient Safety Foundation, Patient Safety and Low-Flow Anesthesia, 2022: https://www.apsf.org/article/patient-safety-and-low-flow-anesthesia/
+
+
+## Máu mất & truyền máu chu phẫu — bản thử nghiệm
+
+Trang mới thực hiện các phép tính minh bạch từ số liệu người dùng nhập, **không chọn ngưỡng Hb hay truyền máu tự động**. Các nội dung và ví dụ ban đầu dựa trên bài tổng hợp do người dùng cung cấp, sau đó đối chiếu ngưỡng AABB và phương pháp định lượng EBL với tài liệu công khai.
+
+### 1. EBV
+
+EBV = cân nặng (kg) × hệ số (mL/kg). Sáu nhóm tham khảo (có thể sửa thủ công):
+
+| Nhóm | Khoảng tham khảo (mL/kg) | Hệ số điền sẵn |
+|---|---:|---:|
+| Nam trưởng thành | 70–75 | 70 |
+| Nữ trưởng thành | 60–65 | 65 |
+| Trẻ > 1 tuổi | 70–75 | 70 |
+| Trẻ nhũ nhi | 75–80 | 80 |
+| Sơ sinh đủ tháng | 80–90 | 85 |
+| Sơ sinh non tháng | 90–100 | 95 |
+
+Lưu ý giới hạn ước tính ở bệnh nhân béo phì, có thai, trẻ sơ sinh và các tình huống thay đổi thành phần cơ thể. Các hệ số là giá trị giảng dạy, không phải phép đo thể tích máu.
+
+### 2. MABL
+
+- Phương pháp đơn giản Hb: MABL = EBV × (Hb_i − Hb_min) / Hb_i.
+- Công thức Gross dùng Hct trung bình: MABL_Gross = EBV × (Hct_i − Hct_min) / [(Hct_i + Hct_min)/2]. Công thức này xuất hiện trong bối cảnh pha loãng máu đẳng thể tích cấp (ANH) và có những giả định khác với công thức đơn giản, không phải giá trị máu mất an toàn.
+- Dữ liệu Hb và Hct **được nhập riêng**, không mặc định Hct = 3 × Hb.
+- Ví dụ nam 70 kg, hệ số 70: EBV 4900 mL, Hb 12 → 8 thì MABL đơn giản ≈ 1633 mL; với Hct 36 → 24, Gross ≈ 1960 mL. Không chuyển những giá trị này thành lệnh truyền máu.
+
+### 3. EBL định lượng và tốc độ
+
+- EBL ≈ (dịch trong bình hút − dịch rửa trong bình) + (trọng lượng gạc ướt − khô) × 1 mL/g + máu đo thêm chưa tính trùng. Kiểm tra âm, dịch rửa > bình hút và gạc khô > gạc ướt.
+- EBL / EBV và EBL / MABL đơn giản chỉ là tỷ lệ mô tả, không phải ngưỡng điều trị.
+- Ví dụ 1200 mL dịch hút, 400 mL dịch rửa, gạc ướt 550 g, gạc khô 300 g: EBL ≈ 1050 mL.
+- Tốc độ mất máu = lượng mất thêm × 60 / thời gian (phút). Ví dụ 600 mL/30 phút = 1200 mL/giờ. Không ngoại suy tốc độ này cho thời gian tiếp theo.
+
+### 4. Đáp ứng hồng cầu và các tỷ lệ dịch
+
+- Quy tắc kinh nghiệm **1 đơn vị khối hồng cầu ≈ tăng 1 g/dL Hb** dành cho người lớn ổn định, không còn mất máu; chỉ hiện phép tính khi người dùng chủ động xác nhận bối cảnh phù hợp. Hiển thị số đơn vị *tương đương*, không tự làm tròn thành y lệnh truyền máu.
+- 1,5:1 và 3:1 chỉ là **phép nhân so sánh lịch sử/tài liệu** của lượng EBL; không tạo liều dịch, thể tích truyền và không gợi ý hồi sức.
+
+### 5. Ngưỡng Hb tham khảo, không phải bộ quy tắc lâm sàng
+
+- AABB 2023: người trưởng thành ổn định <7 g/dL; có thể chọn 7,5 g/dL ở phẫu thuật tim; 8 g/dL ở phẫu thuật chỉnh hình hoặc có bệnh tim mạch từ trước.
+- AABB 2025: đối với bệnh nhân nội trú nhồi máu cơ tim cấp, gợi ý chiến lược truyền rộng rãi hơn khi Hb <10 g/dL; **khuyến cáo có điều kiện, chứng cứ độ chắc chắn thấp**.
+- Không áp dụng các ngưỡng này cho chảy máu ồ ạt đang tiến triển hoặc sốc mất máu; ưu tiên kiểm soát nguồn, đánh giá tưới máu, hồi sức và quy trình MTP của cơ sở.
+
+### 6. Kiểm thử
+
+Chạy `node blood-tests.js` và các suite trước. GitHub Actions cũng kiểm tra cú pháp `blood.js`, `blood-ui.js` và chạy bộ kiểm thử toán học. Không thay thế rà soát chuyên môn hoặc kiểm định phần mềm y tế.
+
+Nguồn công khai để đối chiếu:
+- https://iowaprotocols.medicine.uiowa.edu/protocols/maximum-allowable-blood-loss
+- https://pmc.ncbi.nlm.nih.gov/articles/PMC11069068/
+- https://pmc.ncbi.nlm.nih.gov/articles/PMC11977757/
+- https://pubmed.ncbi.nlm.nih.gov/37824153/
+- https://pubmed.ncbi.nlm.nih.gov/40825204/
+- https://professionaleducation.blood.ca/en/transfusion/clinical-guide/blood-components
+- https://pmc.ncbi.nlm.nih.gov/articles/PMC11069062/
