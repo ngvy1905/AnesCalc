@@ -19,9 +19,13 @@ jobs:
           node --check inhaled-ui.js
           node --check washin.js
           node --check washin-ui.js
+          node --check blood.js
+          node --check blood-ui.js
       - name: Existing calculator tests
         run: node tests.js
       - name: Inhaled anesthetic calculations tests
         run: node inhaled-tests.js
       - name: Circuit wash-in mathematical tests
         run: node washin-tests.js
+      - name: Perioperative blood calculations tests
+        run: node blood-tests.js
